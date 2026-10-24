@@ -9,7 +9,7 @@ Assistant destiné aux techniciens de maintenance. Il exploite des manuels, proc
 | 1 | Sélection du document | `etape-1-selection-document` |
 | 2 | Extraction et indexation (LlamaIndex, embeddings open source, PGVector) | `etape-2-extraction-indexation` |
 | 3 | Traitement des images (CLIP, descriptions textuelles) | `etape-3-images-clip` |
-| 4 | Question-réponse RAG (Qwen via Ollama) | à venir |
+| 4 | Question-réponse RAG (Qwen via Ollama) | `etape-4-rag-qwen` |
 | 5 | Interface Streamlit | à venir |
 | 6 | Orchestration agentique (LangChain) | à venir |
 
@@ -44,3 +44,12 @@ python scripts/index_images.py       # après scripts/index_pdf.py
 
 - `maintidoc/images.py` : vecteurs CLIP (`clip-ViT-B-32`) dans la table `maintidoc_images` ; descriptions générées par le modèle vision d'Ollama, indexées avec BGE dans la table principale (type `image_description`).
 - `search_images("texte")` retrouve une image à partir d'une requête texte.
+
+## Étape 4 : question-réponse (RAG)
+
+```bash
+ollama pull qwen2.5:3b
+python scripts/ask.py "How many attention heads does the base Transformer use?"
+```
+
+`maintidoc/rag.py` : `RagPipeline` récupère les 5 passages les plus proches dans PGVector, puis demande à Qwen de répondre uniquement à partir de ce contexte, en citant `[1]`, `[2]`… (page et type de chaque source). Le modèle se change avec la variable `LLM_MODEL`.

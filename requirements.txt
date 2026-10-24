@@ -6,3 +6,4 @@ psycopg2-binary>=2.9
 sentence-transformers>=3.0
 pillow>=10
 ollama>=0.4
+llama-index-llms-ollama>=0.11
