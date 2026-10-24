@@ -3,6 +3,7 @@ from pathlib import Path
 
 import streamlit as st
 
+from maintidoc.agent import ask, build_agent
 from maintidoc.ingest import ingest_pdf
 from maintidoc.rag import RagPipeline
 
@@ -18,6 +19,11 @@ def get_pipeline() -> RagPipeline:
     return RagPipeline()
 
 
+@st.cache_resource
+def get_agent():
+    return build_agent(get_pipeline())
+
+
 with st.sidebar:
     st.header("1. Charger un PDF")
     uploaded = st.file_uploader("Document PDF", type="pdf")
@@ -30,16 +36,25 @@ with st.sidebar:
             counts = ingest_pdf(path, with_images)
         st.success(f"Document indexé : {counts}")
 
+    st.header("Mode")
+    agent_mode = st.toggle("Mode agent (LangChain)", help="L'agent choisit lui-même ses outils de recherche.")
+
 st.header("2. Poser une question")
 question = st.text_input("Votre question", placeholder="Que signifie le voyant orange ?")
 if st.button("Envoyer") and question.strip():
-    with st.spinner("Recherche et génération de la réponse..."):
-        result = get_pipeline().answer(question)
-    st.subheader("Réponse")
-    st.write(result.text)
-    st.subheader("Sources")
-    for s in result.sources:
-        with st.expander(f"[{s.ref}] page {s.page} · {s.type} · score {s.score:.2f}"):
-            if s.image_path and Path(s.image_path).exists():
-                st.image(s.image_path)
-            st.text(s.text)
+    if agent_mode:
+        with st.spinner("L'agent cherche et réfléchit..."):
+            answer = ask(get_agent(), question, thread_id="streamlit")
+        st.subheader("Réponse (agent)")
+        st.write(answer)
+    else:
+        with st.spinner("Recherche et génération de la réponse..."):
+            result = get_pipeline().answer(question)
+        st.subheader("Réponse")
+        st.write(result.text)
+        st.subheader("Sources")
+        for s in result.sources:
+            with st.expander(f"[{s.ref}] page {s.page} · {s.type} · score {s.score:.2f}"):
+                if s.image_path and Path(s.image_path).exists():
+                    st.image(s.image_path)
+                st.text(s.text)

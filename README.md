@@ -11,7 +11,7 @@ Assistant destiné aux techniciens de maintenance. Il exploite des manuels, proc
 | 3 | Traitement des images (CLIP, descriptions textuelles) | `etape-3-images-clip` |
 | 4 | Question-réponse RAG (Qwen via Ollama) | `etape-4-rag-qwen` |
 | 5 | Interface Streamlit | `etape-5-streamlit` |
-| 6 | Orchestration agentique (LangChain) | à venir |
+| 6 | Orchestration agentique (LangChain) | `etape-6-agent-langchain` |
 
 ## Étape 1 : document de test
 
@@ -61,3 +61,11 @@ streamlit run app.py
 ```
 
 Barre latérale : chargement du PDF et indexation (`maintidoc/ingest.py`). Page principale : saisie de la question, réponse et sources dépliables (avec l'image quand la source en est une).
+
+## Étape 6 : agent LangChain
+
+```bash
+python scripts/ask_agent.py "Which figure shows the Transformer architecture?"
+```
+
+`maintidoc/agent.py` : `create_agent` (LangChain) avec deux outils, `search_documents` (texte et tableaux, via le RAG) et `search_images` (CLIP). Le modèle (Qwen via `ChatOllama`) décide quel outil appeler, éventuellement plusieurs fois ; `InMemorySaver` garde le contexte de la conversation par `thread_id`. Dans `streamlit run app.py`, le bouton « Mode agent » active cet agent.
