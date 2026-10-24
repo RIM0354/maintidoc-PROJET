@@ -8,7 +8,7 @@ Assistant destiné aux techniciens de maintenance. Il exploite des manuels, proc
 |---|---|---|
 | 1 | Sélection du document | `etape-1-selection-document` |
 | 2 | Extraction et indexation (LlamaIndex, embeddings open source, PGVector) | `etape-2-extraction-indexation` |
-| 3 | Traitement des images (CLIP, descriptions textuelles) | à venir |
+| 3 | Traitement des images (CLIP, descriptions textuelles) | `etape-3-images-clip` |
 | 4 | Question-réponse RAG (Qwen via Ollama) | à venir |
 | 5 | Interface Streamlit | à venir |
 | 6 | Orchestration agentique (LangChain) | à venir |
@@ -34,3 +34,13 @@ python scripts/index_pdf.py          # extrait, vectorise (BGE) et stocke dans P
 
 - `maintidoc/extract.py` : texte (passages de ~512 tokens), tableaux (en Markdown) et images (PNG dans `data/images/`) deviennent des nœuds LlamaIndex avec leurs métadonnées (source, page, type, légende).
 - `maintidoc/index.py` : embeddings `BAAI/bge-small-en-v1.5` et stockage via `PGVectorStore`.
+
+## Étape 3 : images (CLIP + descriptions)
+
+```bash
+ollama pull qwen2.5vl:3b             # modèle vision pour décrire les images
+python scripts/index_images.py       # après scripts/index_pdf.py
+```
+
+- `maintidoc/images.py` : vecteurs CLIP (`clip-ViT-B-32`) dans la table `maintidoc_images` ; descriptions générées par le modèle vision d'Ollama, indexées avec BGE dans la table principale (type `image_description`).
+- `search_images("texte")` retrouve une image à partir d'une requête texte.

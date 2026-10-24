@@ -17,11 +17,11 @@ def get_embed_model() -> BaseEmbedding:
     return HuggingFaceEmbedding(model_name=EMBED_MODEL)
 
 
-def get_vector_store() -> PGVectorStore:
+def get_vector_store(table_name: str = TABLE_NAME, embed_dim: int = EMBED_DIM) -> PGVectorStore:
     u = urlparse(DATABASE_URL)
     return PGVectorStore.from_params(
         host=u.hostname, port=u.port or 5432, user=u.username, password=u.password,
-        database=u.path.lstrip("/"), table_name=TABLE_NAME, embed_dim=EMBED_DIM,
+        database=u.path.lstrip("/"), table_name=table_name, embed_dim=embed_dim,
     )
 
 

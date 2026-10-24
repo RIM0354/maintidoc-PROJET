@@ -3,3 +3,6 @@ llama-index-core>=0.14
 llama-index-vector-stores-postgres>=0.9
 llama-index-embeddings-huggingface>=0.8
 psycopg2-binary>=2.9
+sentence-transformers>=3.0
+pillow>=10
+ollama>=0.4
