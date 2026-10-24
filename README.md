@@ -7,7 +7,7 @@ Assistant destiné aux techniciens de maintenance. Il exploite des manuels, proc
 | Étape | Contenu | Branche |
 |---|---|---|
 | 1 | Sélection du document | `etape-1-selection-document` |
-| 2 | Extraction et indexation (LlamaIndex, embeddings open source, PGVector) | à venir |
+| 2 | Extraction et indexation (LlamaIndex, embeddings open source, PGVector) | `etape-2-extraction-indexation` |
 | 3 | Traitement des images (CLIP, descriptions textuelles) | à venir |
 | 4 | Question-réponse RAG (Qwen via Ollama) | à venir |
 | 5 | Interface Streamlit | à venir |
@@ -23,3 +23,14 @@ python scripts/inspect_pdf.py
 ```
 
 Résultat sur ce PDF : ~5000 mots, 3 images matricielles (pages 3 et 4), 3 tableaux détectés automatiquement (pages 6, 8, 9). L'article en compte 4 : l'un est mal détecté, ce qui illustre pourquoi l'étape 2 utilisera un parseur plus robuste.
+
+## Étape 2 : extraction et indexation
+
+```bash
+docker compose up -d                 # PostgreSQL + extension pgvector
+pip install -r requirements.txt
+python scripts/index_pdf.py          # extrait, vectorise (BGE) et stocke dans PGVector
+```
+
+- `maintidoc/extract.py` : texte (passages de ~512 tokens), tableaux (en Markdown) et images (PNG dans `data/images/`) deviennent des nœuds LlamaIndex avec leurs métadonnées (source, page, type, légende).
+- `maintidoc/index.py` : embeddings `BAAI/bge-small-en-v1.5` et stockage via `PGVectorStore`.
