@@ -1,7 +1,10 @@
 """Étape 2 : extrait le PDF, calcule les embeddings et les stocke dans PGVector."""
 import sys
-from collections import Counter
 from pathlib import Path
+
+# Python ne met que scripts/ dans le chemin d'import : on ajoute la racine du dépôt
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from collections import Counter
 
 from maintidoc.extract import extract_nodes
 from maintidoc.index import build_index, get_embed_model
